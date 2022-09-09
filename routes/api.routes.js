@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const bcrypt = require("bcrypt");
+const { response } = require("../app");
 const saltRounds = 10;
 const User = require("../models/User.model");
 
@@ -40,7 +41,10 @@ router.post("/signin", (req, res) =>{
     })
     
 
+router.get("/auth" , (req, res) =>{
+    res.send(req.session.user);
 
+})
 
 
 
