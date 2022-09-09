@@ -5,6 +5,7 @@ const saltRounds = 10;
 const User = require("../models/User.model");
 
 
+// Sign Up
 
 router.post("/signup", (req, res) =>{
      console.log("Hi there ", req.body)
@@ -24,6 +25,8 @@ router.post("/signup", (req, res) =>{
 
 })
 
+// Sign In
+
 router.post("/signin", (req, res) =>{
     console.log("Loggin in? ", req.body)
 
@@ -39,10 +42,26 @@ router.post("/signin", (req, res) =>{
         } )
     
     })
+
+
+// Log Out
+
+router.delete("/logout", (req, res) =>{
+    res.clearCookie("connect.sid");
+    req.session.destroy();
+})
     
 
+// Get Auth
+
 router.get("/auth" , (req, res) =>{
-    res.send(req.session.user);
+    if(req.session.currentUser){
+        return res.status(200).json(req.session);
+    }
+
+    else{
+        return false
+    }
 
 })
 
