@@ -2,6 +2,7 @@ const router = require("express").Router();
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const User = require("../models/User.model");
+const Image = require("../models/Image.model")
 const uploadCloud = require("../config/cloudinary");
 
 
@@ -65,22 +66,45 @@ router.get("/auth" , (req, res) =>{
 
 })
 
+// Get Images
+
+router.get("/image", (req, res) =>{
+    // console.log("Asking for Images")
+
+    Image.find()
+        .then(response => res.status(200).json(response) )
+        .catch((err) => console.log(err));
+})
+
 
 // Upload Image 
 
-router.post("/image", uploadCloud.single(`image`), (req, res) =>{
-    console.log("Hi, I'm Uploading an Image")
-    console.log(req.body)
-    console.log(req.file)
-    const {name} = req.body;
-    const {path} = req.file;
 
-    Image.create({
-        name,
-        image: path,
+router.post("/upload", uploadCloud.single("imageUrl"), (req, res, next) => {
+    // console.log("file is: ", req.file);
+  
+
+    if (!req.file) {
+      next(new Error("No file uploaded!"));
+      return;
+    }
+    // get the URL of the uploaded file and send it as a response.
+    // 'fileUrl' can be any name, just make sure you remember to use the same when accessing it on the frontend
+  
+    res.json({ fileUrl: req.file.path });
+  });
+  
+
+
+
+router.post("/image", (req, res) =>{
+
+    Image.create(req.body)
+    .then( (response) => {
+        //  console.log("This is the Image", response)
+         res.status(200).json({message: 'image uploaded'})
     })
     .catch(err => console.error(err))
-
 }) 
 
 
