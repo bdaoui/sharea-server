@@ -1,8 +1,8 @@
 const router = require("express").Router();
 const bcrypt = require("bcrypt");
-const { response } = require("../app");
 const saltRounds = 10;
 const User = require("../models/User.model");
+const uploadCloud = require("../config/cloudinary");
 
 
 // Sign Up
@@ -66,7 +66,22 @@ router.get("/auth" , (req, res) =>{
 })
 
 
+// Upload Image 
 
+router.post("/image", uploadCloud.single(`image`), (req, res) =>{
+    console.log("Hi, I'm Uploading an Image")
+    console.log(req.body)
+    console.log(req.file)
+    const {name} = req.body;
+    const {path} = req.file;
+
+    Image.create({
+        name,
+        image: path,
+    })
+    .catch(err => console.error(err))
+
+}) 
 
 
 module.exports = router;
