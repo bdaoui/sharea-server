@@ -14,14 +14,12 @@ router.post("/signup", (req, res) =>{
     bcrypt
         .genSalt(saltRounds)
         .then( (salt) => bcrypt.hash(password, salt) )
-        .then( (hashedPassword) => 
-        {
+        .then( (hashedPassword) => {
             User.create({
                 username,
                 email,
                 password: hashedPassword
             })
-
         })
 
 })
@@ -47,9 +45,10 @@ router.post("/signin", (req, res) =>{
 
 // Log Out
 
-router.delete("/logout", (req, res) =>{
+router.post("/logout", (req, res) =>{
     res.clearCookie("connect.sid");
     req.session.destroy();
+    console.log('session destroyed:', req.session)
 })
     
 
