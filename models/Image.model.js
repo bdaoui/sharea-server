@@ -4,7 +4,7 @@ const imageSchema = new Schema(
   {
     name: String,
     imageUrl: String,
-    Owner: { type: Schema.Types.ObjectId, ref: "User"},
+    owner: { type: Schema.Types.ObjectId, ref: "User"},
     comments: [],
     tags: []
   },

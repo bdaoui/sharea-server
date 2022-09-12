@@ -81,8 +81,9 @@ router.get("/image", (req, res) =>{
 
 
 router.post("/upload", uploadCloud.single("imageUrl"), (req, res, next) => {
-    // console.log("file is: ", req.file);
-  
+    console.log("upload image link is: ", req.file);
+    const {name} = req.body;
+    const imageUrl = req.file.path;
 
     if (!req.file) {
       next(new Error("No file uploaded!"));
@@ -91,21 +92,22 @@ router.post("/upload", uploadCloud.single("imageUrl"), (req, res, next) => {
     // get the URL of the uploaded file and send it as a response.
     // 'fileUrl' can be any name, just make sure you remember to use the same when accessing it on the frontend
   
-    res.json({ fileUrl: req.file.path });
-  });
-  
-
-
-
-router.post("/image", (req, res) =>{
-
-    Image.create(req.body)
+    Image.create({name, imageUrl})
     .then( (response) => {
         //  console.log("This is the Image", response)
          res.status(200).json({message: 'image uploaded'})
     })
     .catch(err => console.error(err))
-}) 
+
+  });
+  
+
+
+
+// router.post("/image", (req, res) =>{
+
+    
+// }) 
 
 
 module.exports = router;
