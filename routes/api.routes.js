@@ -7,7 +7,6 @@ const uploadCloud = require("../config/cloudinary");
 
 
 // Sign Up
-
 router.post("/signup", (req, res) =>{
      console.log("Hi there ", req.body)
     const {username, password, email} = req.body;
@@ -21,52 +20,42 @@ router.post("/signup", (req, res) =>{
                 password: hashedPassword
             })
         })
-
 })
 
 // Sign In
-
 router.post("/signin", (req, res) =>{
-    console.log("Loggin in? ", req.body)
-
     const {username, password} = req.body;
   
     User.findOne({username})
-        .then(user =>{
-            if( bcrypt.compareSync(password, user.password) ){
-                req.session.currentUser = user;
+        .then(username =>{
+            if( bcrypt.compareSync(password, username.password) ){
+                req.session.currentUser = username;
+                res.status(200).json(req.session);
                 console.log(req.session)
             }
             else{ console.log('false')}
         } )
-    
     })
 
-
 // Log Out
-
 router.post("/logout", (req, res) =>{
     res.clearCookie("connect.sid");
     req.session.destroy();
     console.log('session destroyed:', req.session)
 })
-    
 
 // Get Auth
-
 router.get("/auth" , (req, res) =>{
+    console.log('hello world')
     if(req.session.currentUser){
         return res.status(200).json(req.session);
     }
-
     else{
         return false
     }
-
 })
 
 // Get Images
-
 router.get("/image", (req, res) =>{
     // console.log("Asking for Images")
 
@@ -77,8 +66,6 @@ router.get("/image", (req, res) =>{
 
 
 // Upload Image 
-
-
 router.post("/upload", uploadCloud.single("imageUrl"), (req, res, next) => {
     console.log("upload image link is: ", req.file);
     const {name} = req.body;
