@@ -45,15 +45,15 @@ router.post("/logout", (req, res) =>{
 })
 
 // Get Auth
-router.get("/auth" , (req, res) =>{
-    console.log('hello world')
-    if(req.session.currentUser){
-        return res.status(200).json(req.session);
-    }
-    else{
-        return false
-    }
-})
+// router.get("/auth" , (req, res) =>{
+//     console.log('hello world')
+//     if(req.session.currentUser){
+//         return res.status(200).json(req.session);
+//     }
+//     else{
+//         return false
+//     }
+// })
 
 // Get Images
 router.get("/image", (req, res) =>{
