@@ -11,6 +11,7 @@ const uploadCloud = require("../config/cloudinary");
 router.post("/signup", (req, res) =>{
      console.log("Hi there ", req.body)
     const {username, password, email} = req.body;
+
     bcrypt
         .genSalt(saltRounds)
         .then( (salt) => bcrypt.hash(password, salt) )
@@ -32,7 +33,6 @@ router.post("/signin", (req, res) =>{
     console.log("Loggin in? ", req.body)
 
     const {username, password} = req.body;
-  
     User.findOne({username})
         .then(user =>{
             if( bcrypt.compareSync(password, user.password) ){
