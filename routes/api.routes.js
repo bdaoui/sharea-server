@@ -26,10 +26,12 @@ router.post("/signup", (req, res) =>{
 // Sign In
 router.post("/signin", (req, res) =>{
     const {username, password} = req.body;
-    User.findOne({username})
-        .then(username =>{
-            if( bcrypt.compareSync(password, username.password) ){
-                req.session.currentUser = username;
+    User.find({username})
+    .then(user =>{
+            console.log(req.body, user)
+                
+            if( bcrypt.compareSync(password, user.password) ){
+                req.session.currentUser = user;
                 res.status(200).json(req.session);
                 console.log(req.session)
             }
