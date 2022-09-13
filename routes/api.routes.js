@@ -31,7 +31,7 @@ router.post("/signin", (req, res) =>{
             if( bcrypt.compareSync(password, username.password) ){
                 req.session.currentUser = username;
                 res.status(200).json(req.session);
-                console.log(req.session)
+                // console.log(req.session)
             }
             else{ console.log('false')}
         } )
@@ -45,15 +45,16 @@ router.post("/logout", (req, res) =>{
 })
 
 // Get Auth
-// router.get("/auth" , (req, res) =>{
-//     console.log('hello world')
-//     if(req.session.currentUser){
-//         return res.status(200).json(req.session);
-//     }
-//     else{
-//         return false
-//     }
-// })
+router.get("/auth" , (req, res) =>{
+    console.log('hi')
+    if(req.session){
+        console.log(req.session)
+        return res.status(200).json(req.session.currentUser);
+    }
+    else{
+        return 
+    }
+})
 
 // Get Images
 router.get("/image", (req, res) =>{
