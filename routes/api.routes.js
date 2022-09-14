@@ -25,6 +25,7 @@ router.post("/signup", (req, res) =>{
 
 // Sign In
 router.post("/signin", (req, res) =>{
+    console.log('welcome in', req.session)
     const {username, password} = req.body;
     User.findOne({username})
         .then(username =>{
@@ -68,8 +69,11 @@ router.get("/image", (req, res) =>{
 
 // Upload Image 
 router.post("/upload", uploadCloud.single("imageUrl"), (req, res, next) => {
+    console.log("This is the Image", req.body)
     console.log("upload image link is: ", req.file);
     const {name} = req.body;
+    
+    const tags = JSON.parse(req.body.tags)
     const imageUrl = req.file.path;
 
     if (!req.file) {
@@ -79,9 +83,9 @@ router.post("/upload", uploadCloud.single("imageUrl"), (req, res, next) => {
     // get the URL of the uploaded file and send it as a response.
     // 'fileUrl' can be any name, just make sure you remember to use the same when accessing it on the frontend
   
-    Image.create({name, imageUrl})
+    Image.create({name, imageUrl, tags})
     .then( (response) => {
-        //  console.log("This is the Image", response)
+         console.log("This is the Image", response)
          res.status(200).json({message: 'image uploaded'})
     })
     .catch(err => console.error(err))
