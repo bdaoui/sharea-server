@@ -9,19 +9,15 @@ const { get } = require("mongoose");
 
 // Sign Up
 router.post("/signup", (req, res) =>{
-     console.log("Hi there ", req.body)
+    console.log("Hi there ", req.body)
     const {username, password, email} = req.body;
     bcrypt
         .genSalt(saltRounds)
         .then( (salt) => bcrypt.hash(password, salt) )
         .then( (hashedPassword) => {
-            User.create({
-                username,
-                email,
-                password: hashedPassword
-            })
+            User.create({ username, email, password: hashedPassword })
         })
-})
+});
 
 // Sign In
 router.post("/signin", (req, res) =>{
@@ -32,6 +28,7 @@ router.post("/signin", (req, res) =>{
         .then(username =>{
             if( bcrypt.compareSync(password, username.password) ){
                 req.session.currentUser = username;
+<<<<<<< HEAD
                 console.log(req.session)
                 res.status(200).json(username);
                 // console.log(req.session)
@@ -40,6 +37,13 @@ router.post("/signin", (req, res) =>{
         } )
         .catch(err => console.log(err))
     })
+=======
+                res.status(200).json(username);
+            }
+            else{ console.log('false')}
+        })
+});
+>>>>>>> 375dabd5a3b4f4666776244dd149545f8716660f
 
 // Log Out
 router.post("/logout", (req, res) =>{
@@ -47,10 +51,11 @@ router.post("/logout", (req, res) =>{
     //res.clearCookie("connect.sid");
     req.session.destroy();
     console.log('session destroyed:', req.session)
-})
+});
 
 // Get Auth
 router.get("/auth" , (req, res) =>{
+<<<<<<< HEAD
 
     console.log(req.session)
     res.status(200).json(req.session.currentUser);
@@ -66,49 +71,52 @@ router.get("/auth/:id", (req, res) =>{
         })
         .catch(err => console.log(err));
 })
+=======
+    console.log('hi')
+    if(req.session){
+        return res.status(200).json(req.session.currentUser);
+    }
+    else{
+        return 
+    }
+});
+>>>>>>> 375dabd5a3b4f4666776244dd149545f8716660f
 
 // Get Images
 router.get("/image", (req, res) =>{
-    // console.log("Asking for Images")
-
     Image.find()
         .then(response => res.status(200).json(response) )
         .catch((err) => console.log(err));
-})
+});
 
 
 // Upload Image 
 router.post("/upload", uploadCloud.single("imageUrl"), (req, res, next) => {
-    console.log("This is the Image", req.body)
-    console.log("upload image link is: ", req.file);
     const {name} = req.body;
-    
     const tags = JSON.parse(req.body.tags)
     const imageUrl = req.file.path;
-
     if (!req.file) {
       next(new Error("No file uploaded!"));
       return;
     }
-    // get the URL of the uploaded file and send it as a response.
-    // 'fileUrl' can be any name, just make sure you remember to use the same when accessing it on the frontend
-  
     Image.create({name, imageUrl, tags})
     .then( (response) => {
          console.log("This is the Image", response)
          res.status(200).json({message: 'image uploaded'})
     })
     .catch(err => console.error(err))
-
-  });
+});
   
+router.post("/profile", (req, res) => {
+    const {location, occupation, info, id} = req.body;
+    if (!location && !occupation && !info){
+        res.status(500).json({message: 'Please enter input'})
+    }
+    User.findByIdAndUpdate({ _id:id }, { location: location, occupation: occupation, info: info})
+        .then( (res) => console.log(res))
+        .catch((err) => console.log(err))
+})
 
-
-
-// router.post("/image", (req, res) =>{
-
-    
-// }) 
 
 
 module.exports = router;
