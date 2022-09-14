@@ -23,27 +23,17 @@ router.post("/signup", (req, res) =>{
 router.post("/signin", (req, res) =>{
     console.log('welcome in', req.session)
     const {username, password} = req.body;
-  
+
     User.findOne({username})
         .then(username =>{
             if( bcrypt.compareSync(password, username.password) ){
                 req.session.currentUser = username;
-<<<<<<< HEAD
-                console.log(req.session)
-                res.status(200).json(username);
-                // console.log(req.session)
-            }
-            else{ console.log('false')}
-        } )
-        .catch(err => console.log(err))
-    })
-=======
+                console.log(username)
                 res.status(200).json(username);
             }
             else{ console.log('false')}
         })
 });
->>>>>>> 375dabd5a3b4f4666776244dd149545f8716660f
 
 // Log Out
 router.post("/logout", (req, res) =>{
@@ -55,24 +45,6 @@ router.post("/logout", (req, res) =>{
 
 // Get Auth
 router.get("/auth" , (req, res) =>{
-<<<<<<< HEAD
-
-    console.log(req.session)
-    res.status(200).json(req.session.currentUser);
-   
-})
-
-router.get("/auth/:id", (req, res) =>{
-    const {id} = req.params;
-    User.findById(id)
-        .then(response =>{
-            req.session.currentUser = response;
-            res.json(response)
-        })
-        .catch(err => console.log(err));
-})
-=======
-    console.log('hi')
     if(req.session){
         return res.status(200).json(req.session.currentUser);
     }
@@ -80,7 +52,6 @@ router.get("/auth/:id", (req, res) =>{
         return 
     }
 });
->>>>>>> 375dabd5a3b4f4666776244dd149545f8716660f
 
 // Get Images
 router.get("/image", (req, res) =>{
@@ -89,19 +60,32 @@ router.get("/image", (req, res) =>{
         .catch((err) => console.log(err));
 });
 
+    // Get Images By Id 
+    router.get("/image/:id", (req, res) =>{
+        const {id} = req.params;
+        Image.find()
+            .populate("owner")
+            .then(response=> {
+             let filtered = response.find(image => image.owner._id.toString() === id)
+             res.status(200).json(filtered)
+            })  
+            .catch((err) => console.log(err));
+    });
+
 
 // Upload Image 
 router.post("/upload", uploadCloud.single("imageUrl"), (req, res, next) => {
-    const {name} = req.body;
-    const tags = JSON.parse(req.body.tags)
+    const {owner, name} = req.body;
+
+    const tags = JSON.parse(req.body.tags);
     const imageUrl = req.file.path;
+
     if (!req.file) {
       next(new Error("No file uploaded!"));
       return;
     }
-    Image.create({name, imageUrl, tags})
+    Image.create({name, imageUrl, tags, owner})
     .then( (response) => {
-         console.log("This is the Image", response)
          res.status(200).json({message: 'image uploaded'})
     })
     .catch(err => console.error(err))
