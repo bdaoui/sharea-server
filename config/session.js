@@ -10,12 +10,12 @@ app.use(
     saveUninitialized: true,
 
     cookie: {
-        maxAge: 60000
+        maxAge: 1000 * 60 * 60 * 24
       },
     
     store: new MongoStore({
         mongoUrl: process.env.DB_URI || "mongodb://localhost/sharea",
-        ttl: 14 * 24 * 60 * 60 
+        ttl: 60 * 60 * 24
     })
 }))
 
