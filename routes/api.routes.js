@@ -43,13 +43,12 @@ router.post("/logout", (req, res) =>{
 });
 
 // Get Auth
-router.get("/auth" , (req, res) =>{
-    if(req.session){
-        return res.status(200).json(req.session.currentUser);
-    }
-    else{
-        return 
-    }
+router.get("/user/:id" , (req, res) =>{
+   const {id} = req.params
+   User.findById(id)
+   .then((response) => {return res.status(200).json(response)})
+   .catch((err) => console.log(err))
+
 });
 
 // Get Images
@@ -91,8 +90,7 @@ router.get("/image", (req, res) =>{
         
         Image.findById(id)
             .populate('owner comments')
-            .then(response => {console.log('1', response)
-                res.status(200).json(response)})
+            .then(response => res.status(200).json(response))
             .catch((err) => console.log(err));
     });
 
@@ -114,6 +112,20 @@ router.post("/upload", uploadCloud.single("imageUrl"), (req, res, next) => {
     .catch(err => console.error(err))
 });
 
+router.post("/image/:id/delete", (req, res) =>{
+    const {id} = req.params 
+    Image.deleteOne({_id : id})
+    .then(res.status(200).json({message: 'image deleted'}))
+    .catch(res => console.log(res))
+});
+
+router.post("/comment/:id/delete", (req, res) =>{
+    const {id} = req.params
+    console.log('hello', id)
+    Comment.deleteOne({_id : id})
+    .then(res.status(200).json({message: 'comment deleted'}))
+    .catch(res => console.log(res))
+});
 
 router.post("/profile", (req, res) => {
     const {location, occupation, info, id} = req.body;
@@ -121,10 +133,8 @@ router.post("/profile", (req, res) => {
         res.status(500).json({message: 'Please enter input'})
     }
     User.findByIdAndUpdate({ _id:id }, { location: location, occupation: occupation, info: info})
-        .then( (res) => console.log(res))
+        .then((res) => console.log(res))
         .catch((err) => console.log(err))
 })
-
-
 
 module.exports = router;
