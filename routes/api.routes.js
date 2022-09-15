@@ -3,9 +3,8 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const User = require("../models/User.model");
 const Image = require("../models/Image.model")
+const Comment = require("../models/Comment.model")
 const uploadCloud = require("../config/cloudinary");
-const { get } = require("mongoose");
-
 
 // Sign Up
 router.post("/signup", (req, res) =>{
@@ -60,8 +59,8 @@ router.get("/image", (req, res) =>{
         .catch((err) => console.log(err));
 });
 
-    // Get Images By Id 
-    router.get("/image/:id", (req, res) =>{
+    // Get Images By Id Owner 
+    router.get("/image/:id/owner", (req, res) =>{
         const {id} = req.params;
         Image.find()
             .populate("owner")
@@ -72,6 +71,30 @@ router.get("/image", (req, res) =>{
             .catch((err) => console.log(err));
     });
 
+       // Get Images By Id  
+       router.get("/image/:id", (req, res) =>{
+        const {id} = req.params;
+        Image.findById(id)
+            .populate("comments owner")
+            .then(response=> {res.status(200).json(response)})
+            .catch((err) => console.log(err));
+    });
+  
+
+    router.post(`/image/:id/comment`, (req, res) =>{
+        const {id} = req.params;
+        const {comment, owner} = req.body;
+        
+        Comment.create({comment, owner})
+            .then(response => { return Image.updateOne( {_id : id}, {$push: {comments : [response._id]}})})
+            .catch((err) => console.log(err));
+        
+        Image.findById(id)
+            .populate('owner comments')
+            .then(response => {console.log('1', response)
+                res.status(200).json(response)})
+            .catch((err) => console.log(err));
+    });
 
 // Upload Image 
 router.post("/upload", uploadCloud.single("imageUrl"), (req, res, next) => {
@@ -90,7 +113,8 @@ router.post("/upload", uploadCloud.single("imageUrl"), (req, res, next) => {
     })
     .catch(err => console.error(err))
 });
-  
+
+
 router.post("/profile", (req, res) => {
     const {location, occupation, info, id} = req.body;
     if (!location && !occupation && !info){
