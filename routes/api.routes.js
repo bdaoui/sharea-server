@@ -66,7 +66,7 @@ router.get("/image", (req, res) =>{
         Image.find()
             .populate("owner")
             .then(response=> {
-             let filtered = response.find(image => image.owner._id.toString() === id)
+             let filtered = response.filter(image => image.owner._id.toString() === id)
              res.status(200).json(filtered)
             })  
             .catch((err) => console.log(err));
