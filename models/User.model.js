@@ -7,7 +7,7 @@ const UserSchema = new Schema(
         email: {type: String, required:true, unique: true},
         location: String,
         occupation: String,
-        info: String
+        info: String,
     }
 )
 const User = model("User", UserSchema);
