@@ -3,8 +3,9 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const User = require("../models/User.model");
 const Image = require("../models/Image.model")
-const Comment = require("../models/Comment.model")
 const uploadCloud = require("../config/cloudinary");
+const { get } = require("mongoose");
+
 
 // Sign Up
 router.post("/signup", (req, res) =>{
@@ -43,12 +44,13 @@ router.post("/logout", (req, res) =>{
 });
 
 // Get Auth
-router.get("/user/:id" , (req, res) =>{
-   const {id} = req.params
-   User.findById(id)
-   .then((response) => {return res.status(200).json(response)})
-   .catch((err) => console.log(err))
-
+router.get("/auth" , (req, res) =>{
+    if(req.session){
+        return res.status(200).json(req.session.currentUser);
+    }
+    else{
+        return 
+    }
 });
 
 // Get Images
@@ -58,8 +60,8 @@ router.get("/image", (req, res) =>{
         .catch((err) => console.log(err));
 });
 
-    // Get Images By Id Owner 
-    router.get("/image/:id/owner", (req, res) =>{
+    // Get Images By Id 
+    router.get("/image/:id", (req, res) =>{
         const {id} = req.params;
         Image.find()
             .populate("owner")
@@ -70,29 +72,6 @@ router.get("/image", (req, res) =>{
             .catch((err) => console.log(err));
     });
 
-       // Get Images By Id  
-       router.get("/image/:id", (req, res) =>{
-        const {id} = req.params;
-        Image.findById(id)
-            .populate("comments owner")
-            .then(response=> {res.status(200).json(response)})
-            .catch((err) => console.log(err));
-    });
-  
-
-    router.post(`/image/:id/comment`, (req, res) =>{
-        const {id} = req.params;
-        const {comment, owner} = req.body;
-        
-        Comment.create({comment, owner})
-            .then(response => { return Image.updateOne( {_id : id}, {$push: {comments : [response._id]}})})
-            .catch((err) => console.log(err));
-        
-        Image.findById(id)
-            .populate('owner comments')
-            .then(response => res.status(200).json(response))
-            .catch((err) => console.log(err));
-    });
 
 // Upload Image 
 router.post("/upload", uploadCloud.single("imageUrl"), (req, res, next) => {
@@ -111,30 +90,17 @@ router.post("/upload", uploadCloud.single("imageUrl"), (req, res, next) => {
     })
     .catch(err => console.error(err))
 });
-
-router.post("/image/:id/delete", (req, res) =>{
-    const {id} = req.params 
-    Image.deleteOne({_id : id})
-    .then(res.status(200).json({message: 'image deleted'}))
-    .catch(res => console.log(res))
-});
-
-router.post("/comment/:id/delete", (req, res) =>{
-    const {id} = req.params
-    console.log('hello', id)
-    Comment.deleteOne({_id : id})
-    .then(res.status(200).json({message: 'comment deleted'}))
-    .catch(res => console.log(res))
-});
-
+  
 router.post("/profile", (req, res) => {
     const {location, occupation, info, id} = req.body;
     if (!location && !occupation && !info){
         res.status(500).json({message: 'Please enter input'})
     }
     User.findByIdAndUpdate({ _id:id }, { location: location, occupation: occupation, info: info})
-        .then((res) => console.log(res))
+        .then( (res) => console.log(res))
         .catch((err) => console.log(err))
 })
+
+
 
 module.exports = router;
