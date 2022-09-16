@@ -57,6 +57,7 @@ router.get("/auth" , (req, res) =>{
 // Get Images
 router.get("/image", (req, res) =>{
     Image.find()
+        .populate("owner")
         .then(response => res.status(200).json(response) )
         .catch((err) => console.log(err));
 });
@@ -73,6 +74,43 @@ router.get("/image", (req, res) =>{
             .catch((err) => console.log(err));
     });
 
+       // Get Images By Id  
+       router.get("/image/:id", (req, res) =>{
+        const {id} = req.params;
+        Image.findById(id)
+            .populate("comments owner")
+            .populate({
+                path: "comments",
+                populate: {
+                    path: "owner", //populate the review owner within the review model
+                    model: "User",
+      },
+    })
+            .then(response=> {res.status(200).json(response)})
+            .catch((err) => console.log(err));
+    });
+  
+
+    router.post(`/image/:id/comment`, (req, res) =>{
+        const {id} = req.params;
+        const {comment, owner} = req.body;
+        
+        Comment.create({comment, owner})
+            .then(response => { return Image.updateOne( {_id : id}, {$push: {comments : [response._id]}})})
+        return Image.findById(id)
+            .populate('comments owner')
+            .populate({
+                path: "comments",
+                populate: {
+                    path: "owner", //populate the review owner within the review model
+                    model: "User",
+      },
+    })
+            .then(response => {
+                console.log(response.comments)
+                res.status(200).json(response)})
+            .catch((err) => console.log(err));
+    });
 
 // Upload Image 
 router.post("/upload", uploadCloud.single("imageUrl"), (req, res, next) => {
@@ -101,6 +139,13 @@ router.post("/profile", (req, res) => {
         .then( (res) => console.log(res))
         .catch((err) => console.log(err))
 })
+// router.get("/profile/:id", (req, res) => {
+//     const {id} = req.params;
+//     User.findById(id)
+//         .then((res) => console.log(res))
+//         .catch((err) => console.log(err))
+// })
+
 
 
 
