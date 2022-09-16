@@ -151,7 +151,6 @@ router.post("/profile", (req, res) => {
         .then((res) => console.log(res))
         .catch((err) => console.log(err))
 })
-
 // router.get("/profile/:id", (req, res) => {
 //     const {id} = req.params;
 //     User.findById(id)
