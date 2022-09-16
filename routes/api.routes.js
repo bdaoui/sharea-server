@@ -26,6 +26,7 @@ router.post("/signin", (req, res) =>{
 
     User.findOne({username})
         .then(username =>{
+            console.log("This is Log In ", username)
             if( bcrypt.compareSync(password, username.password) ){
                 req.session.currentUser = username;
                 console.log(username)
